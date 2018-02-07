@@ -1,0 +1,85 @@
+/*$icon-size:55px;
+*/
+
+
+.nav-link
+{
+    font-size: 16px;
+    /*text-transform: uppercase;*/
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+    /*font-family: 'Helvetica ', sans-serif;*/
+}
+  
+
+.navbar-brand
+{
+  text-transform: uppercase;
+  font-family: 'Catamaran', sans-serif;
+  font-size: 26px !important;
+
+}
+/*.navbar-default {
+    background-color: #0F1108;
+    border-color: #0F1108;
+}*/
+
+.navbar-default .navbar-brand {
+    color: #EEF0F2;
+}
+
+/*.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+    color: #FFFFFF;
+}*/
+
+/* Link */
+/*.navbar-default .navbar-nav > li > a {
+    color: #0F1108;
+}
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #CAD8DE;
+}
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+    color: #EAEAEA;
+    background-color: #0F1108;
+}*/
+
+.carousel-item{
+  min-height: 100%;
+  height: 790px;
+  width: 100%;
+}
+
+/*824px*/
+
+/*.container-fluid{
+  padding-left: 140px;
+  padding-right: 140px;
+}
+*/
+/*.fa{
+  font-size: $icon-size;
+}*/
+
+.footertxt1{
+
+text-align: center;
+color:white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
