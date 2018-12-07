@@ -7,19 +7,21 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\request;
+use App\User;
 class SendMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $user;
+    // protected $user;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public $user;
+
+    public function __construct(User $user)
     {
-        //
         $this->user = $user;
     }
 
@@ -28,11 +30,8 @@ class SendMail extends Mailable
      *
      * @return $this
      */
-    public function build(Request $request)
+    public function build()
     {
-        // return $this->view('mail',['message'=>$request->firstname])->to('$request->email')
-        return $this->view('email.email')->with([
-        'email_token' => $this->user->email_token,  
-        ]);
+        return $this->view('email.send_token')->subject(' Verify your Email');
     }
 }

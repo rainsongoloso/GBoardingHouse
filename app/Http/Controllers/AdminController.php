@@ -10,6 +10,7 @@ use App\Occupant;
 use App\Amenities;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
+use App\Reservation;
 class AdminController extends Controller
 {
     public function __construct()
@@ -24,8 +25,12 @@ class AdminController extends Controller
         $amen = Amenities::all();
 
     	$users = User::where('role','Tenant')->get();
-        
-    	return view('admin.dashboard.index',compact('rooms','users','amen'));
+
+        $getNow = \Carbon\Carbon::now();
+        $toString = $getNow->toDateString();
+        $totalReserv = Reservation::whereDate('created_at',$toString)->where('status','Active')->count('id');
+
+    	return view('admin.dashboard.index',compact('rooms','users','amen','totalReserv'));
     }
 
     public function occupantsDatatable()
@@ -39,10 +44,6 @@ class AdminController extends Controller
         {
             return $occupant->user->full_name;
         })
-        ->addColumn('address', function($occupant)
-        {
-            return $occupant->user->address();
-        })
         ->addColumn('roomType', function($occupant)
         {
             return $occupant->room->type;
@@ -53,36 +54,41 @@ class AdminController extends Controller
         })
         ->addColumn('amenity', function($occupant)
         {
-            if($occupant->isNull())
+
+            if(count($occupant->amenities) > 0)
             {
-                return $occupant->amenity->amen_name;
+                $amenities = $occupant->amenities;
+                foreach ($amenities as $amenity) 
+                {
+                    $toArray[] = $amenity->amen_name; 
+                }
+                return $toArray;  
             }
             else
             {
-                return 'None';
+                return 'None';  
             }
-            
         })
         ->addColumn('started', function($occupant)
         {
-            if($occupant->user->reservation != null)
-            {
-                $occupanter = $occupant->user->reservation->start_date;
+            // if($occupant->user->reservation != null)
+            // {
+            //     $occupanter = $occupant->user->reservation->check_in;
 
-                $formatDate = Carbon::parse($occupanter);
+            //     $formatDate = Carbon::parse($occupanter);
+
+            //     $dateStarted = $formatDate->toFormattedDateString();
+
+            //     return $dateStarted;
+            // }
+            // else
+            // {
+                $formatDate = Carbon::parse($occupant->start_date);
 
                 $dateStarted = $formatDate->toFormattedDateString();
 
                 return $dateStarted;
-            }
-            else
-            {
-                $formatDate = Carbon::parse($occupant->created_at);
-
-                $dateStarted = $formatDate->toFormattedDateString();
-
-                return $dateStarted;
-            }
+            //}
         })
         ->addColumn('end_date', function($occupant)
         {
@@ -99,25 +105,24 @@ class AdminController extends Controller
                 return " ";
             }
         })
-        ->addColumn('action', function($occupant){
+        ->addColumn('action', function($occupant){       
+        if($occupant->flag == 1)
+        {
+           return 
+        '<button class="btn btn-success btn-sm edit-data-btn" data-id="'.$occupant->id.'" data-toggle="tooltip" data-placement="left" title="Change Room">Change room
+        </button>
 
-            if($occupant->flag == 1)
-            {
-                return 
-                '<button class="btn btn-success edit-data-btn" data-id="'.$occupant->id.'" data-toggle="tooltip" data-placement="left" title="Change Room"><i class="fa fa-wrench"></i>
-                </button>
+        <button class="btn btn-info btn-sm avail-data-btn" data-id="'.$occupant->id.'" data-toggle="tooltip" data-placement="right" title="Avail Amenity">Avail/Change amenity
+        </button>
 
-                <button class="btn btn-info avail-data-btn" data-id="'.$occupant->id.'" data-toggle="tooltip" data-placement="right" title="Avail Amenity"><i class="fa fa-rss
-                "></i>
-                </button>
-                 
-                <button class="btn btn-danger leave-data-btn" data-id="'.$occupant->id.'" data-toggle="tooltip" data-placement="top" title="leave tenant"><i class="fa fa-minus-circle"></i>
-                </button>';
-            }
-            else
-            {
-                return "None";
-            }
+        <button class="btn btn-danger btn-sm leave-data-btn" data-id="'.$occupant->id.'" data-toggle="tooltip" data-placement="top" title="leave tenant">Check out
+        </button>';   
+        }
+        else
+        {   
+            return "Checked out";
+        }      
+        
         })
         ->make(true);
     }
@@ -125,13 +130,23 @@ class AdminController extends Controller
     public function changeRoom($id)
     {
        $occupant = Occupant::find($id);
-       $rooms = Room::where('status', 'Available')->orWhere('status','Occupied')->get();
+       $rooms = Room::where('status', 'Available')->orWhere('status','Occupied')->orderBy('type')->get();
        return view('admin.dashboard.changeRoom',compact('occupant','rooms'));     
     }
 
 
     public function roomChanged(Request $request, $id)
     {
+        $occupantA = Occupant::find($id)->amenities()->get();
+            
+        foreach ($occupantA as $occ) 
+        {                         
+            if($occ->id == 2 && $occ->amen_name == 'Aircon')
+            {
+                return response()->json(['success' => false, 'msg' => 'Error! Room cannot be change. Aircon is availed']);
+            }
+        }
+
         $occupants = Occupant::find($id);
 
         //getRoomID
@@ -211,48 +226,75 @@ class AdminController extends Controller
     public function availAmenity($id)
     {
         $occupant = Occupant::find($id);
-
         $amenities = Amenities::all();
+        $amenities2 = array();
+        foreach ($amenities as $amenity) 
+        {
+           $amenities2[$amenity->id] = $amenity->amen_name; 
+        }       
 
-        return view('admin.dashboard.avail_amenity',compact('occupant','amenities'));
+        return view('admin.dashboard.avail_amenity')->withOccupant($occupant)->withAmenities($amenities2);
     }
 
     public function availed(Request $request, $id)
     {
-
-        // $e = $request->get('amenities');
-
-        // dd($e);
-
-        $validatedData = $request->validate([
-        'amenity' => 'nullable',
-        ]);
-
         $occupant = Occupant::find($id);
-
-        if($request->amenity == 0)
-        {
-            $occupant->amenities_id = NULL; 
-        }
-        else
-        {
-           $occupant->amenities_id = $request->amenity;
-
-            // $occupant->amenities_id = $e;
-            // $occupant->save();
-
-        }
-
-        if($occupant->save())
-        {
-            return response()->json(['success' => true, 'msg' => 'Amenity Successfully availed']);
-        }
-        else
-        {
-
-          return response()->json(['success' => false, 'msg' => 'An error occured while availing amenity!']);                        
-        } 
         
+        $occupantr = $occupant->room->type;
+
+
+
+        if($occupantr == 'Bed Spacer')
+        {
+            if(count($request->amenities) > 0 )
+            {
+                foreach ($request->amenities as $key) 
+                {
+                    if($key == 2)
+                    {
+                        return response()->json(['success' => false, 'msg' => 'Aircon cannot be availed by bedspacers']);
+                    }
+                }
+            } 
+
+            if(isset($request->amenities))
+            {
+              if($occupant->amenities()->sync($request->amenities))
+                {
+                return response()->json(['success' => true, 'msg' => 'Amenity Successfully availed']);
+                }
+                else
+                {
+                    return response()->json(['success' => false, 'msg' => 'An error occured while availing/changing amenities!']);   
+                }  
+            }
+            else
+            {
+                $occupant->amenities()->sync(array());
+
+                return response()->json(['success' => true, 'msg' => 'No amenities availed']);
+            }        
+                
+        }
+        else
+        {
+            if(isset($request->amenities))
+            {
+              if($occupant->amenities()->sync($request->amenities))
+                {
+                return response()->json(['success' => true, 'msg' => 'Amenity Successfully availed']);
+                }
+                else
+                {
+                    return response()->json(['success' => false, 'msg' => 'An error occured while availing/changing amenities!']);   
+                }  
+            }
+            else
+            {
+                $occupant->amenities()->sync(array());
+            }
+        }
+
         
     }
 
@@ -284,17 +326,30 @@ class AdminController extends Controller
             $getRoomIdFromOccupant = $occupanted->room_id;
 
             $room = Room::find($getRoomIdFromOccupant);
-            
-                if($room->current_capacity <= 0)
-                {  
-                    $room->status == 'Available';
+
+            $minusOne = $room->current_capacity;
+
+            if($room->type == 'Private')
+            { 
+                $room->status = "Available";
+
+                $room->current_capacity = $minusOne-1;
+            }
+            //bedspacer
+            else
+            {
+                $room->current_capacity = $minusOne-1;
+
+                if($room->current_capacity == 0)
+                {
+                    $room->status = "Available";
                 }
                 else
                 {
-                    $minusOne = $room->current_capacity;
-
-                    $room->current_capacity = $minusOne-1; 
-                }
+                    $room->status = "Occupied";
+                } 
+            }
+                    
                 if($room->save())
                 {
                 //User Table User_id == Occupant Table User id
@@ -308,7 +363,7 @@ class AdminController extends Controller
 
                     if($user->save()) 
                     {
-                      return response()->json(['success' => true, 'msg' => 'Occupant Successfully leaved!']);  
+                      return response()->json(['success' => true, 'msg' => 'Occupant Successfully checked out!']);  
                     }
                     else
                     {
@@ -328,7 +383,7 @@ class AdminController extends Controller
 
     public function assignClient()
     {
-        $users = User::where('role','Client')->where('status','Active')->get();
+        $users = User::where('role','<>','Admin')->where('status','Active')->get();
 
         $rooms = Room::where('status','Available')->orWhere('status','Occupied')->orderBy('type')->get();
 
@@ -339,58 +394,68 @@ class AdminController extends Controller
 
     public function storeAssign(Request $request)
     {      
+        $validatedData = request()->validate([
+        'user_id'     => 'required',
+        'room_id'      => 'required',
+        ]);
+
         $occupant = new Occupant;
         $occupant->user_id = $request->user_id;
         $occupant->room_id = $request->room_id;
-        $occupant->amenities_id = $request->amenities_id;
+        
         $occupant->flag = 1;
         
         if($occupant->save())
         {
-          $room = Room::find($request->room_id);
-
-          $addCcap = $room->current_capacity; 
+            $room = Room::find($request->room_id);
+        
+            $addCcap = $room->current_capacity; 
           
-          if($room->type == 'Private')
-          {
-            $room->current_capacity = $addCcap+1;
+              if($room->type == 'Private')
+              {
+                $room->current_capacity = $addCcap+1;
 
-            $room->status = 'Full';
-          }
-          //bedspacer
-          else
-          {
-            $room->current_capacity = $addCcap+1;
-
-            if($room->current_capacity >= $room->max_capacity)
-            {
                 $room->status = 'Full';
-            }
-            else
-            {
-                $room->status = 'Occupied';
-            }
-          }
+              }
+              //bedspacer
+              else
+              {
+                $room->current_capacity = $addCcap+1;
 
-          if($room->save())
-          {
-            $userSetTenant = User::find($request->user_id);
-            $userSetTenant->role = "Tenant";
-            if($userSetTenant->save())
-            {     
-                return response()->json(['success' => true, 'msg' => 'User Successfully added!']);  
+                if($room->current_capacity >= $room->max_capacity)
+                {
+                    $room->status = 'Full';
+                }
+                else
+                {
+                    $room->status = 'Occupied';
+                }
+              }
+
+            if($room->save())
+            {
+                $userSetTenant = User::find($request->user_id);
+                $userSetTenant->role = "Tenant";
+
+                if($userSetTenant->save())
+                {
+                  return response()->json(['success' => true, 'msg' => 'Occupant Successfully added!']);  
+                }
+                else
+                {
+                    return response()->json(['success' => false, 'msg' => 'An error occured while updating room!']);     
+                }
             }
             else
             {
-                return response()->json(['success' => false, 'msg' => 'An error occured while adding user!']);
-            } 
-          }       
+                return response()->json(['success' => false, 'msg' => 'An error occured while updating room!']);
+            }
         }
         else
         {
-            return response()->json(['success' => false, 'msg' => 'An error occured while adding user!']);
-        }               
-    } 
+            return response()->json(['success' => false, 'msg' => 'An error occured while updating occupant!']);
+        }
+    }
 
     // public function chart()
     // {

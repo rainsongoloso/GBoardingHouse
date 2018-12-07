@@ -56,4 +56,9 @@ class Occupant extends Model
 	{
 		return $this->financials->credit->sum();
 	}
+
+	public function amenities()
+	{
+		return $this->belongsToMany('App\Amenities','occupant_amenities','occupant_id','amenities_id');
+	}
 }

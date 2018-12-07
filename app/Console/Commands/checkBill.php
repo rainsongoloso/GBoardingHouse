@@ -46,13 +46,15 @@ class checkBill extends Command
 
         $format = $today->toDateString(); 
 
-        $ocF = Occupant::with('financials')
-        ->where('flag',1)
-        ->whereHas('financials', function($query) use ($format)
-        {
-            $query->where('payment_for', $format);
-        })
-        ->get();
+        // $ocF = Occupant::with('financials')
+        // ->where('flag',1)
+        // ->whereHas('financials', function($query) use ($format)
+        // {
+        //     $query->where('payment_for', $format);
+        // })
+        // ->get();
+        
+        $ocF = Occupant::where('flag',1)->where('start_date',$format)->get();
 
         foreach ($ocF as $oc) {
 
@@ -60,14 +62,14 @@ class checkBill extends Command
         
             $rRoom = $occupant->room->roomRate();
 
-            if($occupant->isNull())
+            $getRates = 0;
+            
+            foreach ($occupant->amenities as $amen)
             {
-                $totalRate = $rRoom + $occupant->amenity->rate;   
+                $getRates += $amen->rate; 
             }
-            else
-            {   
-                $totalRate = $rRoom;
-            }
+
+            $totalRate = $rRoom + $getRates;
 
             $financial = new Financial;
 
@@ -77,9 +79,10 @@ class checkBill extends Command
 
             $financial->remarks = 'Rent';
 
-            $addMonth = \Carbon\Carbon::now();
+            $thisMonth = \Carbon\Carbon::now();
+            // $addMonth->addMonth();
 
-            $financial->payment_for = $addMonth->addMonth();
+            $financial->payment_for = $thisMonth;
 
             $financial->debit = $totalRate;
           

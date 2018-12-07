@@ -57,9 +57,12 @@ class HomeController extends Controller
 
             $financial2 = Occupant::find($getOccuId)->financials->sum('debit');
 
-            $balance = abs($financial1 - $financial2);
+            $balance = $financial1 - $financial2;
 
-            return view('tenant.financials',compact('occupant','financials','financial1','$financial2','balance'));
+            $occupantA = Occupant::find($getOccuId)->amenities()->get();
+            $occupantASum = Occupant::find($getOccuId)->amenities()->sum('rate');
+
+            return view('tenant.financials',compact('occupant','financials','financial1','$financial2','balance','occupantA','occupantASum'));
         }
         else
         {
@@ -121,4 +124,15 @@ class HomeController extends Controller
 
       return back();
     }
+
+    public function reservation()
+    { 
+      $getId = Auth::user()->id;
+
+      $uReservation = User::find($getId); 
+
+      return view('tenant.reservation',compact('uReservation'));
+    }
+
+
 }

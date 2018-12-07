@@ -39,18 +39,31 @@ class checkReservation extends Command
      */
     public function handle()
     {
-        $reservations = Reservation::where('status','Active')->get();
+        $getToday = \Carbon\Carbon::now();
+        $lastweek = $getToday->subDays(7);
+        $format = $lastweek->toDateString();
+        $getYear = $lastweek->year;
+        $getMonth = $lastweek->month;
+        $getDay = $lastweek->day;
+       
+        $reservations = App\Reservation::where('status','=','Active')
+        ->whereMonth('created_at','=',$getMonth)
+        ->whereDay('created_at','=',$getDay)
+        ->whereYear('created_at','=',$getYear)
+        ->get();
+
+        $reservationsId = App\Reservation::where('status','=','Active')
+        ->whereMonth('created_at','=',$getMonth)
+        ->whereDay('created_at','=',$getDay)
+        ->whereYear('created_at','=',$getYear)
+        ->pluck('id');
 
         foreach($reservations as $reservation)
         {
-            if($reservation->created_at->diffInMonths(Carbon::now()) == 1)
-            {
-                $reservation->status = 'Cancel';
-
-                $reservation->save();
-            } 
+            $reservation->status = 'Cancel';
+            $reservation->save();
         }
         
-        Session::flash('message','Reservation has been canceled');
+        Session::flash('message','Canceled Reservations'.$reservationsId);
     }
 }

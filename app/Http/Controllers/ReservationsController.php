@@ -27,26 +27,34 @@ class ReservationsController extends Controller
 
     public function reservationDatatable()
     {
-        // $activeReservation = Reservation::where('status','Active')->orWhere('status', 'Settled');
         $activeReservation = Reservation::latest()->get();
 
         return Datatables::of($activeReservation)
         ->addColumn('action', function($reservation){
         if($reservation->status != 'Settled' && $reservation->status != 'Cancel' )
         {
-        return '<button class="btn btn-success edit-data-btn" data-id="'.$reservation->id.'">
+        return '<button class="btn btn-success btn-sm edit-data-btn" data-id="'.$reservation->id.'">
         <i class="fa fa-edit"></i></a>
         </button>
 
-        <button class="btn btn-info settle-data-btn" data-id="'.$reservation->id.'">
+        <button class="btn btn-info btn-sm settle-data-btn" data-id="'.$reservation->id.'">
         <i class="fa fa-credit-card"></i></a>
         </button>
-
-        <button class="btn btn-warning cancel-data-btn" data-id="'.$reservation->id.'">
-        <i class="fa fa-remove"></i></a>
+      
+        <button class="btn btn-danger btn-sm delete-data-btn" data-id="'.$reservation->id.'">
+        <i class="fa fa-trash"></i></a>
         </button>
-        ';  
+        ';
         }
+        else
+        {
+            return '<button class="btn btn-danger btn-sm delete-data-btn" data-id="'.$reservation->id.'">
+        <i class="fa fa-trash"></i></a>
+        </button>';
+        }
+        //   <button class="btn btn-warning btn-sm cancel-data-btn" data-id="'.$reservation->id.'">
+        // <i class="fa fa-remove"></i></a>
+        // </button>
 
         })
         ->addColumn('roomNo', function($reservation)
@@ -61,28 +69,24 @@ class ReservationsController extends Controller
         {
             return $reservation->user->id ." - ". $reservation->user->full_name;
         })
-        ->addColumn('amenity', function($reservation)
-        {
-            if($reservation->amenity == null)
-            {
-                return 'None';
-            }
-            else
-            {
-                return $reservation->amenity->name;     
-            }
-        })
         ->addColumn('dateReserv', function($reservation)
         {   
             $dateFormat = Carbon::parse($reservation->created_at);
-            $dateReserv = $dateFormat->toDayDateTimeString();
-            return $dateReserv;
+
+            $phpformat = date("M d, Y", strtotime($reservation->created_at));
+            return $phpformat;
         })
         ->addColumn('startDate', function($reservation)
         {   
-            $dateFormat = Carbon::parse($reservation->start_date);
+            $dateFormat = Carbon::parse($reservation->check_in);
             $dateStart = $dateFormat->toFormattedDateString();
             return $dateStart;
+        })
+        ->addColumn('checkOut', function($reservation)
+        {   
+            $dateFormat = Carbon::parse($reservation->check_out);
+            $checkOut = $dateFormat->toFormattedDateString();
+            return $checkOut;
         })
         ->make(true);
     }
@@ -91,9 +95,7 @@ class ReservationsController extends Controller
     {
         $users = User::where('role','Client')->where('status','Active')->get();
 
-        $rooms = Room::where('status','Available')->get();
-        
-        // ->where('flag', 0)
+        $rooms = Room::where('status','Available')->orWhere('status','Occupied')->orderBy('type')->get();
 
         $amenities = Amenities::all();
 
@@ -105,21 +107,29 @@ class ReservationsController extends Controller
         $data = request()->validate([
           'user_id'     => 'required|max:25',
           'room_id'     => 'required|max:25',
-          // 'status'      => 'required|max:50',
-          // 'amenities'   => 'max:15|nullable',
-          'start_date'  => 'required|max:15',
-          'downpay'     => 'nullable'    
+          'start_date'  => 'required',
+          'check_out'   => 'required'   
         ]); 
+
+        $getDate = \Carbon\Carbon::parse($request->start_date);
+        $getDate2 = \Carbon\Carbon::parse($request->check_out);
+        $formatDate = $getDate->toDateString();
+        $formatDate2 = $getDate2->toDateString();
 
         $reservation = new Reservation;
         $reservation->user_id = $request->user_id;
         $reservation->room_id = $request->room_id;
-        // $reservation->status  = $request->status;
-        // $reservation->amenities_id = $request->amenities;
-        $reservation->start_date = $request->start_date;
-        if($request->advance == true)
+        $reservation->check_in = $formatDate;
+        $reservation->check_out = $formatDate2;
+
+        $holdDate = $getDate->day;
+        $holdMonth = $getDate->month;
+        $holdDate2 = $getDate2->day;
+        $holdMonth2 = $getDate2->month;
+
+        if($holdDate == $holdDate2 || $holdMonth == $holdMonth2)
         {
-            $reservation->downpay = 1;
+            return response()->json(['success' => false, 'msg' => 'Check in date and Check out date must not be the same and atleast 1 month of check out']);
         }
 
         if($reservation->save())
@@ -136,16 +146,9 @@ class ReservationsController extends Controller
     {
         $reservation = Reservation::find($id);
 
-        // $users = User::where('user_id','Active')->first();
-
-        // $newRoom = new Room;
-        // $getRoomCapacity = $newRoom->max_capacity;
-
-        $rooms = Room::where('status','Available')->get();
+        $rooms = Room::where('status','Available')->orWhere('status','Occupied')->get();
 
         $amenities = Amenities::all();
-
-        // $amenities = Amenities::all();
 
         return view('admin.reservation.change_date_reservation',compact('reservation','rooms','amenities'));
     }
@@ -153,11 +156,9 @@ class ReservationsController extends Controller
     public function storeEditReservation(Request $request, $id)
     {
         $reservation = Reservation::find($id);
-        // $reservation->user_id = $request->user_id;
         $reservation->room_id = $request->room_id;
-        // $reservation->amenities_id = $request->amenities;
-        $reservation->start_date = $request->start_date;
-        // $reservation->status = $request->status; 
+        $reservation->check_in = $request->start_date;
+        $reservation->check_out = $request->check_out; 
         if($reservation->save())
         {
           return response()->json(['success' => true, 'msg' => 'Reservation successfully updated!']);
@@ -198,25 +199,15 @@ class ReservationsController extends Controller
         'remarks' => 'required',
         'amountPay' =>'required'
         ]);
-
-        // $monthToPay = Carbon::parse($request->payment_for);
-        // $now = Carbon::now();
-        // $month = $monthToPay->diffInMonths($now);
         
         $reservation = Reservation::find($id);
 
         $room = Room::find($reservation->room_id);
 
-        $startdate = Carbon::parse($reservation->start_date);
+        $startdate = Carbon::parse($reservation->check_in);
 
         $addmonth = $startdate->addMonths(1);
 
-        // $format = $addmonth->toDateTimeString();
-
-        // dd($format);
-
-        // if( $reservation->start_date > 0)
-        // {
         switch ($request->remarks) 
         {
         case "Advance payment":
@@ -269,6 +260,10 @@ class ReservationsController extends Controller
 
         $getReservRoomId = $reservation->room_id;
 
+        $getReservCheckIn = $reservation->check_in;
+
+        $getReservCheckOut = $reservation->check_out;
+
         $room = Room::find($reservation->room_id);
 
         $occupant = new Occupant;
@@ -277,7 +272,11 @@ class ReservationsController extends Controller
 
         $occupant->user_id = $getReservUserId;
 
-        $occupant->room_id = $getReservRoomId; 
+        $occupant->room_id = $getReservRoomId;
+
+        $occupant->start_date = $getReservCheckIn;
+
+        // $occupant->end_date = $getReservCheckOut;     
 
         $occupant->save();
 
@@ -301,7 +300,7 @@ class ReservationsController extends Controller
                 $room->current_capacity = $getRoomCcap+1;
 
                 //change it to Unavailable cause it is private room
-                $room->status = 'Unavailable';
+                $room->status = 'Full';
 
                 //put it to the financial occupant_id column
                 $financial->occupant_id = $occuId;
@@ -376,10 +375,17 @@ class ReservationsController extends Controller
             return response()->json(['success' => false, 'msg' => 'Error in settling reservation']);
         }        
     }
-    // else
-    // {
-    //     return response()->json(['success' => false, 'msg' => 'At least 1 month']);
-    // }
-    //}
+
+    public function destroy($id)
+    {
+        if(Reservation::destroy($id))
+        {
+          return response()->json(['success' => true, 'msg' => 'Data Successfully deleted!']);
+        }
+        else
+        {
+          return response()->json(['success' => false, 'msg' => 'An error occured while deleting data!']);
+        }
+    }
 }
 

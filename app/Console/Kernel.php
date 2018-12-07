@@ -28,9 +28,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
 
-        $schedule->command('command:checkBill')->monthly();
+        $schedule->command('command:checkBill')->dailyAt('10:00');
                 
-        $schedule->command('command:checkReservation')->monthly();
+        $schedule->command('command:checkReservation')->weekly();
                 
     }
 

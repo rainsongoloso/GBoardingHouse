@@ -1,7 +1,9 @@
 <!-- main for datatables -->
 <script type="text/javascript" src="{{asset('js/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{asset('js/jquery-ui.min.js')}}"></script>
+<!-- datepicker -->
+<script type="text/javascript" src="{{asset('js/bootstrap-datepicker.min.js')}}"></script>
 <script type="text/javascript" src="{{asset('js/jquery.dataTables.min.js')}}"></script>
-<!-- <script type="text/javascript" src="{{asset('js/dataTables.bootstrap4.min.js')}}"></script> -->
 <!-- Datatable buttons -->
 <script type="text/javascript" src="{{asset('js/dataTables.buttons.min.js')}}"></script>
 <script type="text/javascript" src="{{asset('js/buttons.flash.min.js')}}"></script>
@@ -17,7 +19,8 @@
 <script type="text/javascript" src="{{asset('js/bootstrap.bundle.min.js')}}"></script>
 <!-- Chart -->
 <script type="text/javascript" src="{{asset('js/Chart.bundle.min.js')}}"></script>
-
+<!-- select2 -->
+<script type="text/javascript" src="{{asset('js/select2.full.min.js')}}"></script>
 
 
 <script type="text/javascript">

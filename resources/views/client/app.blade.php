@@ -19,6 +19,8 @@
 
         @yield('content')
 
+    @include('admin.layouts.footer')
+
     @include('js-links')
 
         @yield('scripts')

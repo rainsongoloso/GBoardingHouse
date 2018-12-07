@@ -30,7 +30,7 @@ class ManageUsersController extends Controller
     //Active user Datatable
     public function getUsersDatatable()
     {
-      $userActive = User::select(['id','firstname','lastname','street_ad','city','province','dob','email','contact_no','username','status','role'])
+      $userActive = User::select(['id','firstname','lastname','street_ad','city','province','dob','email','contact_no','username','status','role','verified'])
       ->where(function($userActive){
         $userActive->where('status','=','Active');
       });
@@ -47,11 +47,21 @@ class ManageUsersController extends Controller
       return $user->address();
       })
       ->addColumn('action', function($user){
-        return '<button class="btn btn-success edit-data-btn" data-id="'.$user->id.'">
+        return '<button class="btn btn-success btn-sm edit-data-btn" data-id="'.$user->id.'">
                 <i class="fa fa-edit"></i></a>
                 </button>';        
       })
-
+      ->addColumn('verified', function($user){
+        if($user->verified == 1)
+        {
+          return 'Yes'; 
+        }
+        else
+        {
+          return 'No'; 
+        }
+               
+      })
       ->make(true);
     }
 
@@ -76,13 +86,24 @@ class ManageUsersController extends Controller
       })
       ->addColumn('action', function($user){
       return 
-      '<button class="btn btn-info setActive-data-btn" data-id="'.$user->id.'">
+      '<button class="btn btn-info btn-sm setActive-data-btn" data-id="'.$user->id.'">
       Set Active
       </button>
 
-      <button class="btn btn-danger delete-data-btn" data-id="'.$user->id.'">
+      <button class="btn btn-danger btn-sm delete-data-btn" data-id="'.$user->id.'">
       <i class="fa fa-archive"></i>
       </button>';
+      })
+      ->addColumn('verified', function($user){
+        if($user->verified == 1)
+        {
+          return 'Yes'; 
+        }
+        else
+        {
+          return 'No'; 
+        }
+               
       })
       ->make(true);
     }

@@ -28,6 +28,8 @@ class User extends Authenticatable
         'street_ad',
         'city',
         'province',
+        'email_token',
+        'verified'
     ];
 
     /**
@@ -41,7 +43,7 @@ class User extends Authenticatable
 
     public function reservation()
     {
-        return $this->hasOne('App\Reservation');
+        return $this->hasMany('App\Reservation');
     }
     
     public function occupant()

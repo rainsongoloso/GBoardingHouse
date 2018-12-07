@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm mb-5 navbar-dark bg-dark">
+<nav class="navbar navbar-expand-sm mb-5 navbar-dark bg-primary">
     <a href="/client" class="navbar-brand">Client</a>
     <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>

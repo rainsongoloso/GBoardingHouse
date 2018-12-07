@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mt-5">
 <h1 class="text-center">Bed Spacers Rooms</h1>
-<!-- <a href="/online/reservation" class="btn btn-dark"><i class="fa-arrow-left"></i>Back</a> -->
+
 <hr>
 <div class="row ">
 @if(count($bsRooms)>0)
@@ -19,7 +19,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">Current Capacity: {{$room->current_capacity}}</li>
                     <li class="list-group-item">Max Capacity: {{$room->max_capacity}}</li>
-                    <li class="list-group-item">Price: {{number_format($room->roomRate(),2)}}/person</li>
+                    <li class="list-group-item">Price: {{number_format($room->roomRate(),2)}}</li>
                 </ul>
                 <div class="card-body">
                     <a href="/online/{{$room->id}}/reservationForm" class="btn btn-dark btn-md">Reserve</a>

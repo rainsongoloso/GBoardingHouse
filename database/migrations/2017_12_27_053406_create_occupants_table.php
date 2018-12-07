@@ -26,8 +26,8 @@ class CreateOccupantsTable extends Migration
             $table->integer('room_id')->unsigned();
             $table->foreign('room_id')->references('id')->on('rooms');
 
-            $table->integer('amenities_id')->unsigned()->nullable();
-            $table->foreign('amenities_id')->references('id')->on('amenities');
+            // $table->integer('amenities_id')->unsigned()->nullable();
+            // $table->foreign('amenities_id')->references('id')->on('amenities');
 
             // $table->integer('reservations_id')->unsigned()->nullable();
             // $table->foreign('reservations_id')->references('id')->on('reservat');

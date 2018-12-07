@@ -7,8 +7,6 @@ use Carbon\Carbon;
 
 class Room extends Model
 {
-    
-     
     protected $fillable = [
         'room_no','status','type','current_capacity','max_capacity','rate','description','room_image'
     ];
@@ -24,24 +22,14 @@ class Room extends Model
         return $this->rate;
       }
     }
-  	
-  	public function room()
-  	{
-  		return $this->hasOne('App\Reservation');
-  	}
 
     public function occupants()
     {
       return $this->hasMany('App\Occupant');
     }
 
-    // public function monthlyRate()
-    // {
-      
-    //   return $this->rate * 
-    // }
-
-    // public function capacity(){
-    //   return $this->hasMany(RoomCapacity::class);
-    // }
+    public function reservations()
+    {
+      return $this->hasMany('App\Reservation');
+    }
 }

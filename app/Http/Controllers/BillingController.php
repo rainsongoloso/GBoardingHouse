@@ -48,7 +48,11 @@ class BillingController extends Controller
 
           $balance = $financial2 - $financial3;
 
-           return view('admin.financial.financials_table',compact('occupants','occupanter','financial','balance'));  
+          $occupantA = Occupant::find($request->occupant)->amenities()->get();
+
+          $occupantT = Occupant::find($request->occupant)->amenities()->sum('rate');
+
+           return view('admin.financial.financials_table',compact('occupants','occupanter','financial','balance','occupantA','occupantT'));  
         } 
     }
 
@@ -58,12 +62,14 @@ class BillingController extends Controller
 
         $format = $today->toDateString(); 
 
-        $ocF = Occupant::with('financials')
-        ->where('flag',1)
-        ->whereHas('financials', function($query) use ($format){
-            $query->where('payment_for','2018-03-13');
-        })
-        ->get();
+        // $ocF = Occupant::with('financials')
+        // ->where('flag',1)
+        // ->whereHas('financials', function($query) use ($format){
+        //     $query->where('payment_for','2018-03-27');
+        // })
+        // ->get();
+
+        $ocF = Occupant::with('financials')->get();
     
         foreach ($ocF as $oc) {
 
@@ -71,14 +77,14 @@ class BillingController extends Controller
         
             $rRoom = $occupant->room->roomRate();
 
-            if($occupant->isNull())
+            $getRates = 0;
+            
+            foreach ($occupant->amenities as $amen)
             {
-                $totalRate = $rRoom + $occupant->amenity->rate;   
+                $getRates += $amen->rate; 
             }
-            else
-            {   
-                $totalRate = $rRoom;
-            }
+
+            $rRoom + $getRates;
 
             $financial = new Financial;
 

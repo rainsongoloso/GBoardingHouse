@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm mb-5 navbar-dark bg-dark">
+<nav class="navbar navbar-expand-sm mb-5 navbar-dark bg-primary">
     <a href="/client" class="navbar-brand">Tenant</a>
     <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
@@ -10,9 +10,12 @@
                 <a href="/client" class="nav-link">Dashboard</a>
             </li>
             <li class="nav-item">
-                <a href="/tenant/financial" class="nav-link">Financials</a>
+                <a href="/tenant/financial" class="nav-link">View Bills</a>
             </li>
-        </ul>
+<!--              <li class="nav-item">
+                <a href="/tenant/reservation" class="nav-link">Reservations</a>
+            </li>
+ -->        </ul>
     </div>
 
     <ul class="navbar-nav m-auto">

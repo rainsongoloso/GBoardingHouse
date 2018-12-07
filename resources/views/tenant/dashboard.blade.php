@@ -29,11 +29,10 @@
 		<li class="list-group-item">Occupant id: {{$user->occupant->id}}</li>
 		<li class="list-group-item">Room no.: {{$user->occupant->room->room_no}}</li>
 		<li class="list-group-item">Type: {{$user->occupant->room->type}}</li>
-		@if($user->occupant->isNull())
-		<li class="list-group-item">Amenity availed: {{$user->occupant->amenity->amen_name}}</li>
-		@else
-		<li class="list-group-item">No Amenity availed</li>
-		@endif
+		<li class="list-group-item">Amenity availed:@foreach($occupantA as $occu)
+			{{$occu->amen_name}}<br>
+			@endforeach
+		</li>
 	@else
 		You are not an occupant
 	@endif

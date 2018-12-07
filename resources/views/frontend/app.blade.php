@@ -40,9 +40,9 @@
 
     	@yield('content')
 
-	@include('js-links')
-	
 	@include('frontend.layouts.botbar')
+	
+	@include('js-links')
 
 		@yield('scripts')
 </body>

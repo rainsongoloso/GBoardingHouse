@@ -48,16 +48,36 @@ class LoginController extends Controller
         {
             return redirect('/admin'); 
         }
-        else
+        else if($user->role == 'Client')
         {
+            
+            if(!$user->verified == 1)
+            {
+                auth()->logout();
+                return back()->with('warning', 'You need to confirm your account. We have sent you an activation code, please check your email.');
+            }
+            else if($user->status == 'Inactive')
+            {
+                auth()->logout();
+                return back()->with('warning', 'This account is inactive, contact the admin to Activate your account');
+            }
+            else
+            {
+                if(count($user->reservation) > 0)
+                {
+                    return redirect('/client');
+                }
+                else
+                {
+                    return redirect('/');  
+                }
+            }
+             
+        }
+        else
+        {   
             return redirect('/client');
         }
-        
-        // elseif($user->role == 'Tenant')
-        // {
-        //     return redirect('/client');
-        // }
-        // return redirect('/'); 
     }
 
     public function username()
@@ -76,4 +96,9 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
+    protected function attemptLogin(Request $request)
+    {
+        return $this->guard()->attempt($this->credentials($request), $request->filled('remember')
+        );
+    }
 }

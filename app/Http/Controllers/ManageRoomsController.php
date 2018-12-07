@@ -32,25 +32,39 @@ class ManageRoomsController extends Controller
 
     public function getRoomsDatatable()
     {
-        $rooms = Room::select([\DB::raw("CONCAT(rooms.current_capacity,'/',rooms.max_capacity) as capacity"),
-        'id',
-        'room_no',
-        'status',
-        'type',
-        'description',
-        'rate',
-        ])->orderBy('room_no','desc');
-        return Datatables::eloquent($rooms)
+        $rooms = Room::all();
+
+        return Datatables::of($rooms)
+        ->addColumn('created', function($room){
+
+            $toBe = $room->created_at;
+            $format = $toBe->toDayDateTimeString();
+            return $format;
+        })
+        ->addColumn('updated', function($room){
+
+            $toBe = $room->updated_at;
+            $format = $toBe->toDayDateTimeString();    
+            return $format;
+        })
+        ->addColumn('capacity', function($room){
+            
+            return $room->current_capacity .'/'. $room->max_capacity;
+        })
+        ->addColumn('rates', function($room){
+           
+           return $room->roomRate();
+        })
         ->addColumn('action', function($room){
-        return '<button class="btn btn-success edit-data-btn" data-id="'.$room->id.'">
+        return '<button class="btn btn-success btn-sm edit-data-btn" data-id="'.$room->id.'">
                 <i class="fa fa-edit"></i></a>
                 </button> 
 
-                <button class="btn btn-info view-data-btn" data-id="'.$room->id.'">
+                <button class="btn btn-info btn-sm view-data-btn" data-id="'.$room->id.'">
                      <i class="fa fa-eye"></i>
                 </button>  
 
-                <button class="btn btn-danger delete-data-btn" data-id="'.$room->id.'">
+                <button class="btn btn-danger btn-sm delete-data-btn" data-id="'.$room->id.'">
                      <i class="fa fa-trash"></i>
                 </button>       
                 ';
@@ -207,6 +221,7 @@ class ManageRoomsController extends Controller
      */
     public function destroy($id)
     {
+
       $room = Room::find($id);
       if($room->current_capacity > 0)
       {

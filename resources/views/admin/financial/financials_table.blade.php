@@ -10,75 +10,54 @@
                 </div>
                 <ul class="list-group list-group-flush">
 
-                    <li class="list-group-item">Tenant: {{$financial->id }} - {{$financial->user->full_name}}</li>
+                    <li class="list-group-item"><strong>Tenant:</strong> {{$financial->id }} - {{$financial->user->full_name}}</li>
                     
-                    <li class="list-group-item">Room: {{$financial->room->room_no}}</li>
+                    <li class="list-group-item"><strong>Room:</strong> {{$financial->room->room_no}}</li>
 
-                    <li class="list-group-item">Room type: {{$financial->room->type}}</li>
+                    <li class="list-group-item"><strong>Room type:</strong> {{$financial->room->type}}</li>
 
-                    <li class="list-group-item">Price: {{number_format($financial->room->roomRate(),2)}}</li>
+                    <li class="list-group-item"><strong>Room Price:</strong> {{number_format($financial->room->roomRate(),2)}}</li>
 
-                    @if($financial->isNull())
-                    <li class="list-group-item">Amenity availed: {{$financial->amenity->amen_name}}</li>
+                    <li class="list-group-item"><strong>Amenities availed:</strong><br> @foreach($occupantA as $occupant)
+                        {{$occupant->amen_name}} - {{$occupant->rate}}<br>
+                    @endforeach    
+                    </li>
 
-                    <li class="list-group-item">Price: {{number_format($financial->amenity->rate,2)}}</li>
-                    @else
-                    <li class="list-group-item">Amenity availed: None</li>
-
-                    <li class="list-group-item">Price: None</li>
-                    @endif
+                    <li class="list-group-item"><strong>Total amenities price:</strong> {{$occupantT}} </li>
 
                 </ul>
             </div>
             <hr> 
-            @if($financial->isNull())
             <h4>
-                Total: {{number_format($financial->amenity->rate + $financial->room->roomRate(),2)}}
+                Total monthly due: {{number_format( $financial->room->roomRate() + $occupantT,2)}}
             </h4> 
-            @else
-            <h4>
-                Total: {{number_format($financial->room->roomRate(),2)}}
-            </h4> 
-            @endif
         </div>
 
         <div class="col-md-9">
-            <table class="table table-bordered table-striped">
-                <thead class="thead-dark">
+            <table class="table table-striped">
+                <thead class="bg-dark text-white">
                     <tr>
                         <th scope="col">Trans date</th>
                         <!-- <th scope="col">From</th>
                         <th scope="col">To</th> -->
+                        <!-- <th scope="col">Payment for</th> -->
                         <th scope="col">Remarks</th>
                         <th scope="col">Status</th>
                         <th scope="col">Debit</th>
                         <th scope="col">Credit</th>
-                        <th scope="col">Balance</th>
+                        <!-- <th scope="col">Balance</th> -->
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($occupanter as $occupante)
                     <tr>
-                        <!-- <td> -->
-                        <!-- @if($occupante->occupant->user->reservation != null)
-                        {{$occupante->occupant->user->reservation->formatdate()}}
-                        @else -->
-                        <!-- {{$occupante->created_at}} -->
-                        <!-- {{$occupante->occupant->formatCreated()}} -->
-                        <!-- @endif -->
-                        <!-- </td> -->
-                        <!-- <td>{{$occupante->payForFormat()}}</td> -->
                         <td>{{\Carbon\Carbon::parse($occupante->created_at)->format("F j Y")}}</td>
+                        <!-- <td>{{\Carbon\Carbon::parse($occupante->payment_for)->format("F j Y")}}</td>   -->
                         <td>{{$occupante->remarks}}</td>
                         <td>{{$occupante->status}}</td>
-                        <td>{{$occupante->formatDebit()}}</td>
-                        <td>{{$occupante->formatCredit()}}</td>
-                        @if(number_format($occupante->balance(),2) < 0)
-                        <td><p class="text-danger">{{number_format(ABS($occupante->balance()),2)}}</p></td>
-                        @else
-                        <td>{{number_format($occupante->balance(),2)}}</td>
-                        @endif
-                    </tr>
+                        <td class="text-right">{{$occupante->formatDebit()}}</td>
+                        <td class="text-right">{{$occupante->formatCredit()}}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>

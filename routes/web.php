@@ -1,10 +1,14 @@
 <?php
-
 Auth::routes();
+
+//Email verification
+Route::get('verifyEmail','Auth\RegisterController@verifyEmail')->name('verifyEmail');
+
+Route::get('verify/{email}/{token}','Auth\RegisterController@sendEmailDone')->name('sendEmailDone');
 
 Route::get('/', function(){
 	return view('frontend.layouts.carousel');
-});
+})->name('home');
 
 Route::get('/galleries', function(){
 	return view('frontend.layouts.galleries');
@@ -14,15 +18,30 @@ Route::get('/contactus', function(){
 	return view('frontend.layouts.contact_us');
 });
 
+Route::get('/rooms','FrontEndController@displayAllRooms');
+
 Route::get('/online/reservation','FrontEndController@onlineReservation');
 
 Route::get('/online/reservation/bedspacer','FrontEndController@displayBedSpacerRooms');
 
 Route::get('/online/reservation/private','FrontEndController@displayPrivateRooms');
 
-Route::get('/online/{id}/reservationForm','FrontEndController@reservationForm');
+Route::get('/online/{id}/{changeFormat}/{changeFormat2}','FrontEndController@reservationForm');
+
+// Route::get('/online/{id}/reserved','FrontEndController@reservationForm');
 
 Route::post('/online/{id}/reserve','FrontEndController@reserve');
+
+Route::get('/online/reserv','FrontEndController@searchReservation');
+
+
+
+//Test email
+Route::get('register/verify/{token}'	,[
+	'as' => 'confirmation_path',
+	'uses'=> 'FrontEndController@confirm'
+]);
+//
 
 //for Other users
 Route::group(['middleware' => ['isActive','auth']], function()
@@ -37,15 +56,21 @@ Route::get('/client/{id}/reservationEdit','ClientController@reservationEdit');
 
 Route::post('/client/{id}/reseveEdit','ClientController@reseveEdit');
 
+Route::post('/client/{id}/cancelReserv','ClientController@cancelReserv');
+
 Route::post('/client/editAccount','HomeController@editAccount');
 
-Route::get('/sample', function(){
-	return view('admin.sample');
 });
 
+Route::group(['middleware' => ['isTenant','isActive','auth']], function()
+{
 Route::get('/tenant/account', 'HomeController@account');
 
 Route::get('/tenant/financial','HomeController@financial');
+
+Route::get('/tenant/reservation','HomeController@reservation');
+
+Route::get('/tenant/searchreservation','HomeController@searchreservation');
 });
 
 Route::group(['middleware' => ['isAdmin','isActive','auth']], function()
@@ -72,7 +97,7 @@ Route::group(['middleware' => ['isAdmin','isActive','auth']], function()
 	Route::get('/admin/{id}/availAmenity','AdminController@availAmenity');
 
 	Route::post('/admin/{id}/availed','AdminController@availed');
-
+	
 	//Manage Users Routes
 	Route::get('/manage-users/getUsersDatatable','ManageUsersController@getUsersDatatable');
 
@@ -115,6 +140,8 @@ Route::group(['middleware' => ['isAdmin','isActive','auth']], function()
 
 	Route::post('/reservations/{id}/payResevation','ReservationsController@payResevation');
 
+	Route::delete('/reservations/{id}','ReservationsController@destroy');
+
 	//Process Billings 
 	Route::get('/process/billing','ProcessBillingController@index');
 
@@ -155,7 +182,4 @@ Route::group(['middleware' => ['isAdmin','isActive','auth']], function()
 	Route::resource('/manage-amenities','ManageAmenitiesController');
 
 });
-
-
-
 

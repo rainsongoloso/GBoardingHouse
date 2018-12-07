@@ -20,7 +20,7 @@
                     <div class="carousel-caption d-none d-sm-block mb-5">
                         <h1 class="display-3">Reserve A Room</h1>
                         <p class="lead"></p>    
-                        <a href="/online/reservation" class="btn btn-dark btn-lg">Reserve Now</a>                       
+                        <a href="/online/reservation" class="btn btn-dark btn-lg">Reserve</a>                       
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                     <div class="carousel-caption d-none d-sm-block mb-5">
                         <h1 class="display-3">Gallery</h1>
                         <p class="lead"></p>    
-                        <a href="/galleries" class="btn btn-dark btn-lg">View Now</a>                      
+                        <a href="/galleries" class="btn btn-dark btn-lg">View </a>                      
                     </div>
                 </div>
             </div>
@@ -48,9 +48,9 @@
             <div class="carousel-item carousel-image-4">
                 <div class="container">
                     <div class="carousel-caption d-none d-sm-block  mb-5">
-                        <h1 class="display-3">Contact Us</h1>
+                        <h1 class="display-3">About Us</h1>
                         <p class="lead"></p>
-                        <a href="contactus" class="btn btn-dark btn-lg">Contact Now</a>
+                        <a href="contactus" class="btn btn-dark btn-lg">About Us</a>
                     </div>
                 </div>
             </div>

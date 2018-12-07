@@ -16,14 +16,15 @@
     <div class="col-md-12">
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover" id="reservationDatatable">
-                <thead class="thead-dark">
+                <thead class="thead-light">
                     <tr>
                         <th>Id</th>
                         <th>Client</th>
                         <th>Room No.</th>
                         <th>Room Type</th>
                         <th>Status</th>
-                        <th>Start Date</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
                         <th>Date Reserve</th>
                         <th>Actions</th>
                     </tr>
@@ -81,7 +82,7 @@
 $(function() {
     $('#reservationDatatable').DataTable({
 
-      "order": [[ 6, "desc" ]],
+      "order": [[ 7, "dsc" ]],
 
         bProcessing: true,
         bServerSide: false,
@@ -97,6 +98,7 @@ $(function() {
             {data: 'roomType',      name: 'roomType'},
             {data: 'status',        name: 'status'},
             {data: 'startDate',     name: 'startDate'},
+            {data: 'checkOut',      name: 'checkOut'},
             {data: 'dateReserv',    name: 'dateReserv'},
             {data: 'action',        name: 'action', orderable: false, searchable: false},
         ]
@@ -135,7 +137,7 @@ $(document).off('click','.settle-data-btn-data-btn').on('click','.settle-data-bt
           e.preventDefault();
           var that = this; 
                 bootbox.confirm({
-                  title: "Confirm Cancel data Data?",
+                  title: "Confirm Cancel?",
                   className: "del-bootbox text-",
                   message: "Are you sure you want to cancel Reservation?",
                   buttons: {
@@ -157,6 +159,50 @@ $(document).off('click','.settle-data-btn-data-btn').on('click','.settle-data-bt
                       data: { status : 'Cancel', _token : token},
                       success:function(result){
                         $("#cancelReservationDatatable").DataTable().ajax.url( '/reservations/cancelReservationDatatable' ).load();
+                        $("#reservationDatatable").DataTable().ajax.url( '/reservations/reservationDatatable' ).load();
+                        if(result.success){
+                        swal({
+                            title: result.msg,
+                            icon: "success"
+                          });
+                        }else{
+                        swal({
+                            title: result.msg,
+                            icon: "error"
+                          });
+                        }
+                      }
+                      }); 
+                     }
+                  }
+              });
+        });
+
+ $(document).off('click','.delete-data-btn').on('click','.delete-data-btn', function(e){
+          e.preventDefault();
+          var that = this; 
+                bootbox.confirm({
+                  title: "Confirm Delete Data?",
+                  className: "del-bootbox",
+                  message: "Are you sure you want to delete this record?",
+                  buttons: {
+                      confirm: {
+                          label: 'Yes',
+                          className: 'btn-success'
+                      },
+                      cancel: {
+                          label: 'No',
+                          className: 'btn-danger'
+                      }
+                  },
+                  callback: function (result) {
+                     if(result){
+                      var token = '{{csrf_token()}}'; 
+                      $.ajax({
+                      url:'/reservations/'+that.dataset.id,
+                      type: 'post',
+                      data: {_method: 'delete', _token :token},
+                      success:function(result){
                         $("#reservationDatatable").DataTable().ajax.url( '/reservations/reservationDatatable' ).load();
                         if(result.success){
                         swal({

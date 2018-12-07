@@ -12,6 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Session;
 use App\Amenities;
+
 class ProcessBillingController extends Controller
 {
     public function index()
@@ -23,11 +24,6 @@ class ProcessBillingController extends Controller
 
     public function getProcessDatatable()
     {
-       // $financials = DB::table("occupants")
-       // ->select(DB::raw("SUM(financials.credit) - SUM(financials.debit) as totalBalance"))
-       // ->join("financials","financials.occupant_id","=","occupants.id")
-       // ->groupBy("occupants.id")
-       // ->get(); 
 
         $financials = Financial::all();
 
@@ -38,36 +34,22 @@ class ProcessBillingController extends Controller
         ->addColumn('balance', function($financial){
             return $financial->balance();
         })
+        ->addColumn('datepaid', function($financial){
+
+            $format = \Carbon\Carbon::parse($financial->created_at);
+
+            $formated = $format->toFormattedDateString();
+
+            return $formated;
+        })                                                                  
         ->addColumn('monthPayment', function($financial){
 
-            if($financial->occupant->user->reservation != null)
-            {
-                $payforFormat = Carbon::parse($financial->payment_for);
-            
-                $paymentFor = $payforFormat->toFormattedDateString();
 
-                $getStartDate = $financial->occupant->user->reservation->start_date;
+            $format = \Carbon\Carbon::parse($financial->payment_for);
 
-                $format = Carbon::parse($getStartDate);
+            $formated = $format->toFormattedDateString();
 
-                $formated = $format->toFormattedDateString();
-
-                return $formated.'  -  '.$paymentFor;
-            }
-            else
-            {
-                $payforFormat = Carbon::parse($financial->payment_for);
-            
-                $paymentFor = $payforFormat->toFormattedDateString();
-
-                $getCreatedat = $financial->occupant->created_at;
-
-                $format = Carbon::parse($getCreatedat);
-
-                $formated = $format->toFormattedDateString();
-
-                return $formated.'  -  '.$paymentFor;
-            } 
+            return $formated;
         })
         ->make(true);   
     }
@@ -81,10 +63,6 @@ class ProcessBillingController extends Controller
         }
         else
         {
-           // $oc = Occupant::find($request->occupant_id);
-
-           //if(count($oc->financials)>0)
-           //{
               $occupants = Occupant::where('flag',1)->get();
 
                $financial = Occupant::find($request->occupant_id)->financials->sum('credit');
@@ -97,15 +75,12 @@ class ProcessBillingController extends Controller
 
                $occupant = Occupant::find($request->occupant_id);
 
-                return view('admin.process-billing-payment.tenant_payments',compact('occupants','financials','financial','balance','occupant'));  
-           //}
-           // else
-           // {
+               $occupantA = Occupant::find($request->occupant_id)->amenities()->sum('rate');
 
-           //      $occupant = Occupant::find($request->occupant_id);
+               $occuAvail = Occupant::find($request->occupant_id)->amenities()->get();
+               
 
-           //      return view('admin.process-billing-payment.tenant_payments',compact('oc','occupant'));
-           // }  
+                return view('admin.process-billing-payment.tenant_payments',compact('occupants','financials','financial','balance','occupant','occupantA','occuAvail'));   
         }
     }
 
@@ -143,9 +118,6 @@ class ProcessBillingController extends Controller
                 
                 $financial->credit = $request->ammount; 
                 
-                // $addMonth = \Carbon\Carbon::now();
-                // $addMonth->addMonth();
-                
                 $financial->payment_for = $request->payment_for;
 
                 $financial->status = 'Paid';
@@ -172,9 +144,6 @@ class ProcessBillingController extends Controller
                 
             $financial->credit = $request->ammount; 
             
-            // $addMonth = \Carbon\Carbon::now();
-            // $addMonth->addMonth();
-            
             $financial->payment_for = $request->payment_for;
 
             $financial->status = 'Paid';
@@ -196,4 +165,4 @@ class ProcessBillingController extends Controller
         }
     }
 }     
-//}
+

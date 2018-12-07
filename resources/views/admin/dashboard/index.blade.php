@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container-fluid">
+  @include('success')
   <div class="row">
     <div class="col-md-11 text-right">
         <h4>Today: {{\Carbon\Carbon::now('Asia/Singapore')->format('F d Y')}}</h4>
@@ -16,7 +17,7 @@
 <div class="container">
 <hr>
 <div class="row">
-	<div class="col-md-4 ">
+	<div class="col-md-3">
 		<div class="card text-center bg-primary text-white mb-3">
 			<div class="card-body">
 				<h3>Rooms</h3>
@@ -28,7 +29,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-4 ">
+	<div class="col-md-3">
 		<div class="card text-center bg-warning text-white ">
 			<div class="card-body">
 				<h3>Tenants</h3>
@@ -40,7 +41,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-4 ">
+	<div class="col-md-3 ">
 		<div class="card text-center bg-success text-white">
 			<div class="card-body">
 				<h3>Amenities</h3>
@@ -51,6 +52,18 @@
 			</div>
 		</div>
 	</div>
+
+  <div class="col-md-3 ">
+    <div class="card text-center bg-info text-white">
+      <div class="card-body">
+        <h3>New reservations</h3>
+        <h1 class="display-4">
+          <i class="fa fa-address-book-o"></i> {{$totalReserv}}
+        </h1>
+        <a href="/reservations/index" class="btn btn-outline-light btn-sm">View</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="row ">
@@ -77,7 +90,7 @@
 <div class="modal fade" id="changeRoomModal">
   <div class="modal-dialog modal-sm">
       <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
+          <div class="modal-header bg-success text-white">
             <h5 class="modal-title">Change Room</h5>
             <button class="close" data-dismiss="modal"><i class="fa fa-close"></i></button>
           </div>
@@ -99,6 +112,20 @@
       </div>
   </div>
 </div>
+
+<div class="modal fade" id="editavailAmenity">
+  <div class="modal-dialog modal-sm"> 
+      <div class="modal-content">
+          <div class="modal-header bg-warning text-white">
+            <h5 class="modal-title">Edit Amenity</h5>
+            <button class="close" data-dismiss="modal"><i class="fa fa-close"></i></button>
+          </div>
+          <div class="modal-body">
+          </div> 
+      </div>
+  </div>
+</div>
+
 </div>
 
 <!-- Datatable -->
@@ -109,16 +136,15 @@
 	<h2 class="mb-5">Occupants</h2>         
 	    <div class="table-responsive"> 
 	        <table class="table table-striped table-bordered" id="occupantsDatatable">
-	          <thead class="thead-dark">
+	          <thead class="thead-light">
 	            <tr>
 	              <th>Id</th>
 	              <th>Name</th>
-                <th>Address</th>
 	              <th>Room No.</th>
                 <th>Room type</th>
                 <th>Amenity Availed</th> 
-                <th>Date Checkin</th> 
-                <th>Date Checkout</th>  
+                <th>Start date</th> 
+                <th>End date</th>  
 	              <th>Actions</th>
 	            </tr>
 	          </thead>
@@ -129,14 +155,14 @@
 </div>
 </div>
 
-
+<!-- 
 <div class="container">
   <div class="row">
     <div class="col-md-5">
       <canvas id="myChart" width="800" height="500"></canvas>
     </div>
   </div>
-</div>
+</div> -->
 <hr>
 @endsection
 
@@ -154,7 +180,6 @@ $(function(){
         columns: [
             {data: 'id',      name: 'id'},
             {data: 'name',    name: 'name'},
-            {data: 'address', name: 'address'},
             {data: 'room_no', name: 'room_no'},
             {data: 'roomType', name: 'roomType'},
             {data: 'amenity', name: 'amenity'},
@@ -185,6 +210,14 @@ $(document).off('click','.avail-data-btn').on('click','.avail-data-btn', functio
           var that = this;  
             $("#availAmenity").modal();            
           $("#availAmenity .modal-body").load('/admin/'+that.dataset.id+'/availAmenity', function(res){
+          });
+        });
+//Edit amenities
+$(document).off('click','.edita-data-btn').on('click','.edita-data-btn', function(e){
+          e.preventDefault();
+          var that = this;  
+            $("#editavailAmenity").modal();            
+          $("#editavailAmenity .modal-body").load('/admin/'+that.dataset.id+'/editAvailAmenity', function(res){
           });
         });
 
@@ -283,7 +316,7 @@ $(document).off('click','.leave-data-btn').on('click','.leave-data-btn', functio
 
 function showTime() {
   var date = new Date(),
-      utc = new Date(Date.UTC(
+      utc = new Date(Date(
         date.getFullYear(),
         date.getMonth(),
         date.getDate(),

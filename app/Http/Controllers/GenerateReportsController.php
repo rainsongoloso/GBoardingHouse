@@ -28,6 +28,7 @@ class GenerateReportsController extends Controller
                 ->join('rooms','rooms.id', '=', 'occupants.room_id')
                 ->groupBy('users.firstname','users.lastname')
                 ->whereYear('financials.created_at','=', $request->get('year'))
+                ->where('financials.status','Paid')
                 ->get();
         }
         else if($request->get('filter') == 1)
@@ -39,6 +40,7 @@ class GenerateReportsController extends Controller
                 ->join('rooms','rooms.id', '=', 'occupants.room_id')
                 ->groupBy('users.firstname','users.lastname')
                 ->whereMonth('financials.created_at','=', $request->get('month'))
+                ->where('financials.status','Paid')
                 ->get();
         }
         else if($request->get('filter') == 2)
@@ -51,6 +53,7 @@ class GenerateReportsController extends Controller
                 ->groupBy('users.firstname','users.lastname')
                 ->whereMonth('financials.created_at','=', $request->get('month'))
                 ->whereYear('financials.created_at','=', $request->get('year'))
+                ->where('financials.status','Paid')
                 ->get();
         }
         else
@@ -92,100 +95,54 @@ class GenerateReportsController extends Controller
 
        return Datatables::of($monthly)
        ->make(true);
-      // $occupants = \DB::table('occupants')
-      //           ->select('users.firstname','users.lastname', \DB::raw('SUM(credit) as total_credit'))
-      //           ->join('financials','occupants.id', '=', 'financials.occupant_id')
-      //           ->join('users','users.id', '=', 'occupants.user_id')
-      //           ->join('rooms','rooms.id', '=', 'occupants.room_id')
-      //           ->groupBy('users.firstname','users.lastname')
-      //           ->whereMonth('financials.created_at','=', $request->get('month'))
-      //           ->whereYear('financials.created_at','=', $request->get('year'))
-      //           ->get();
-
-     // $occupants = Occupant::with('financials')->where('flag',1);
-
-      
-      
-      // ->addColumn('user', function($occupant){
-      //     return $occupant->user->full_name;
-      // })
-      // ->addColumn('room', function($occupant){
-      //     return $occupant->room->room_no;
-      // })
-      // ->addColumn('amenity', function($occupant){
-      //   if($occupant->isNull())
-      //   {
-      //     return $occupant->amenity->amen_name;
-      //   }
-      //   else
-      //   {
-      //     return 'None';
-      //   }
-      // })
-      // ->addColumn('financial', function($occupant){
-
-      //    $occ = $occupant->financials;
-
-      //    $total = 0;
-
-      //    foreach ($occ as $oc) 
-      //    {
-      //      $total += $oc->credit;
-      //    } 
-
-      //    return $total;
-      // })
-      
     }
 
     public function occupancy()
     {
-      $occupant = Occupant::where('flag',1)->count();
-
-      return view('admin.reports.occupancy',compact('occupant'));
+      return view('admin.reports.occupancy');
     }
 
     public function cReportsDatatable(Request $request)
     {
       
-     if($request->get('filter') == 0)
-      {
-        $occupants = \DB::table('occupants')
-        ->select('occupants.id','users.firstname','users.lastname','rooms.room_no','amenities.amen_name')
-        ->join('users','users.id', '=', 'occupants.user_id')
-        ->join('rooms','rooms.id', '=', 'occupants.room_id')
-        ->join('amenities','amenities.id', '=', 'occupants.amenities_id')
-        ->orderBy('occupants.id')
-        ->whereYear('occupants.created_at','=', $request->get('year'))
-        ->get();
-      }
-      else if($request->get('filter') == 1)
-      {
-          $occupants = \DB::table('occupants')
-        ->select('occupants.id','users.firstname','users.lastname','rooms.room_no','amenities.amen_name')
-        ->join('users','users.id', '=', 'occupants.user_id')
-        ->join('rooms','rooms.id', '=', 'occupants.room_id')
-        ->join('amenities','amenities.id', '=', 'occupants.amenities_id')
-        ->orderBy('occupants.id')
-        ->whereMonth('occupants.created_at','=', $request->get('month'))
-        ->get();
-      }
-      else if($request->get('filter') == 2)
-      {
-          $occupants = \DB::table('occupants')
-        ->select('occupants.id','users.firstname','users.lastname','rooms.room_no','amenities.amen_name')
-        ->join('users','users.id', '=', 'occupants.user_id')
-        ->join('rooms','rooms.id', '=', 'occupants.room_id')
-        ->join('amenities','amenities.id', '=', 'occupants.amenities_id')
-        ->orderBy('occupants.id')
-        ->whereYear('occupants.created_at','=', $request->get('year'))
-        ->whereMonth('occupants.created_at','=', $request->get('month'))
-        ->get();
-      }
-      else
-      {
+     // if($request->get('filter') == 0)
+     //  {
+     //    $occupants = \DB::table('occupants')
+     //    ->select('occupants.id','users.firstname','users.lastname','rooms.room_no','amenities.amen_name')
+     //    ->join('users','users.id', '=', 'occupants.user_id')
+     //    ->join('rooms','rooms.id', '=', 'occupants.room_id')
+     //    ->leftjoin('amenities','amenities.id', '=', 'occupants.amenities_id')
+     //    ->orderBy('occupants.id')
+     //    ->whereYear('occupants.created_at','=', $request->get('year'))
+     //    ->get();
+     //  }
+     //  else if($request->get('filter') == 1)
+     //  {
+     //      $occupants = \DB::table('occupants')
+     //    ->select('occupants.id','users.firstname','users.lastname','rooms.room_no','amenities.amen_name')
+     //    ->join('users','users.id', '=', 'occupants.user_id')
+     //    ->join('rooms','rooms.id', '=', 'occupants.room_id')
+     //    ->leftjoin('amenities','amenities.id', '=', 'occupants.amenities_id')
+     //    ->orderBy('occupants.id')
+     //    ->whereMonth('occupants.created_at','=', $request->get('month'))
+     //    ->get();
+     //  }
+     //  else if($request->get('filter') == 2)
+     //  {
+     //      $occupants = \DB::table('occupants')
+     //    ->select('occupants.id','users.firstname','users.lastname','rooms.room_no','amenities.amen_name')
+     //    ->join('users','users.id', '=', 'occupants.user_id')
+     //    ->join('rooms','rooms.id', '=', 'occupants.room_id')
+     //    ->leftjoin('amenities','amenities.id', '=', 'occupants.amenities_id')
+     //    ->orderBy('occupants.id')
+     //    ->whereYear('occupants.created_at','=', $request->get('year'))
+     //    ->whereMonth('occupants.created_at','=', $request->get('month'))
+     //    ->get();
+     //  }
+     //  else
+     //  {
 
-      }
+     //  }
 
       // $today = \Carbon\Carbon::now();
 
@@ -193,55 +150,51 @@ class GenerateReportsController extends Controller
 
       // $occupants = Occupant::where('flag',1)->whereMonth('created_at',$month)->get();
 
+      if($request->get('filter') == 0)
+      {
+        $occupants = Occupant::whereYear('start_date',$request->get('year'));
+      }
+      else if($request->get('filter') == 1)
+      {
+         $occupants = Occupant::whereMonth('start_date',$request->get('month'));
+      }
+      else if($request->get('filter') == 2) 
+      {
+        $occupants = Occupant::whereMonth('start_date',$request->get('month'))->whereYear('start_date',$request->get('year'));
+      }
+      else
+      {
+        $today = \Carbon\Carbon::now();
+
+        $todayF = $today->toDateString();
+
+        $occupants = Occupant::whereMonth('start_date','<',$todayF);
+      }
+
       return Datatables::of($occupants)
-      // ->addColumn('user', function($occupant){
-      //     return $occupant->user->full_name;
-      // })
-      // ->addColumn('room', function($occupant){
-      //     return $occupant->room->room_no;
-      // })
-      // ->addColumn('amenity', function($occupant){
-      //   if($occupant->isNull())
-      //   {
-      //     return $occupant->amenity->amen_name;
-      //   }
-      //   else
-      //   {
-      //     return 'None';
-      //   }
-      // })
-      // ->addColumn('dateStart', function($occupant){
-      //     if($occupant->user->reservation == !null)
-      //     {
-      //       $format = \Carbon\Carbon::parse($occupant->user->reservation->start_date);
+      ->addColumn('name', function($occupant)
+      {
+          return $occupant->user->full_name; 
+      })
+      ->addColumn('roomNo', function($occupant)
+      {
+          return $occupant->room->room_no; 
+      })
+      ->addColumn('roomType', function($occupant)
+      {
+          return $occupant->room->type; 
+      })
+      ->addColumn('amenities', function($occupant)
+      {
+          $getName = [];
 
-      //       $formated = $format->toFormattedDateString();
-
-      //       return $formated;
-      //     }
-      //     else
-      //     {
-      //       $format = \Carbon\Carbon::parse($occupant->created_at);
-
-      //       $formated = $format->toFormattedDateString();
-
-      //       return $formated;
-      //     }
-      // })
-      // ->addColumn('monthly', function($occupant){
-      //     if($occupant->isNull())
-      //     {
-
-      //       return number_format($occupant->room->roomRate() + $occupant->amenity->rate, 2, '.', ',');
-      //     }
-      //     else
-      //     {
-      //       return number_format($occupant->room->roomRate(), 2, ',', '.');
-      //     }
-      // })
-      // ->addColumn('rType', function($occupant){
-      //     return $occupant->room->type;
-      // })
+          foreach ($occupant->amenities as $amen)
+          {
+              $getName[] = $amen->amen_name;
+          }
+          return $getName;
+          
+      })
       ->make(true);
     }    
 }

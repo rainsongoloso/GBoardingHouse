@@ -19,7 +19,7 @@
   <div class="col-md-12">         
     <div class="table-responsive "> 
         <table class="table table-bordered table-striped table-hover" id="usersDatatable">
-          <thead class="thead-dark">
+          <thead class="thead-light">
             <tr>
               <th>Id</th>
               <th>Name</th>
@@ -30,6 +30,7 @@
               <th>Username</th>
               <th>Status</th>
               <th>Role</th>
+              <th>Verified</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -51,7 +52,7 @@
  <div class="col-md-12">         
     <div class="table-responsive"> 
         <table class="table table-bordered table-striped table-hover" id="usersInactiveDatatable">
-          <thead class="thead-dark">
+          <thead class="thead-light">
             <tr>
               <th>Id</th>
               <th>Name</th>
@@ -62,6 +63,7 @@
               <th>Username</th>
               <th>Status</th>
               <th>Role</th>
+              <th>Verified</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -132,8 +134,9 @@
                 {data: 'username',      name: 'username'},
                 {data: 'status',        name: 'status'},
                 {data: 'role',          name: 'role'},
+                {data: 'verified',      name: 'verified'},
                 {data: 'action' ,       name: 'action', orderable: false, searchable: false}
-            ]
+            ],
         });
 
 $(function() {
@@ -155,6 +158,7 @@ $(function() {
                 {data: 'username',      name: 'username'},
                 {data: 'status',        name: 'status'},
                 {data: 'role',          name: 'role'},
+                {data: 'verified',          name: 'verified'},
                 {data: 'action' ,       name: 'action', orderable: false, searchable: false}
             ]
         })

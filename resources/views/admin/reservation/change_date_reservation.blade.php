@@ -6,9 +6,6 @@
       <div class="text-center"> 
       <h2>{{$reservation->user->id}} - {{$reservation->user->firstname}} {{$reservation->user->lastname}}</h2>
       </div>
-      <!-- <select class="custom-select" id="users" name="user_id" required>
-		  <option value="{{$reservation->user_id}}"> </option>
-		</select> -->
 
 		<label for="room">Rooms</label>
 		<select class="custom-select" id="room" name="room_id" required>
@@ -17,35 +14,14 @@
         @endforeach
 		</select>
     
-    <label for="start_date">Start Date</label>
-    <input id="start_date" type="date" name="start_date" class="form-control" value = "{{$reservation->start_date}}" min="{{$reservation->start_date}}" required>
+    <label for="start_date">Check in</label>
+    <input id="start_date" type="date" name="start_date" class="form-control" value = "{{$reservation->check_in}}" min="{{$reservation->check_in}}" required>
         <span class="help-text text-danger"></span>
 
-	<!-- 	<label for="status">Status</label>
-		<select class="custom-select" id="status" name="status" required>
-			<option value="Active">Active</option>
-			<option value="Settled">Settled</option>
-			<option value="Canceled">Canceled</option>
-		</select> -->
-	
-		
-		
-		<!-- <label for="advance">Advance Payment</label>
-		<input id="advance" type="checkbox" name="advance" class="form-control">
-         <span class="help-text text-danger"></span> -->
-	
-        <!-- <label for="nop">Number of persons</label>
-        <input id="nop" type="text" min="0" name="number_of_persons" class="form-control" required>
-        <span class="help-text text-danger"></span> -->
-		
-		<!-- <label for="status">Amenities</label>
-		<select class="custom-select" id="amenities" name="amenities">
+    <label for="check_out">Check out</label>
+    <input id="check_out" type="date" name="check_out" class="form-control" value = "{{$reservation->check_out}}" min="{{$reservation->check_out}}" required>
+        <span class="help-text text-danger"></span>    
 
-          @foreach($amenities as $amenity)
-          <option value="{{$amenity->id}}">{{$amenity->name}} {{$amenity->rate}} {{$amenity->description}}</option>
-          @endforeach  
-		</select> -->
-    
 	</div>
 	<div class="modal-footer"> 
 		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

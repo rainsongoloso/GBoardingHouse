@@ -3,53 +3,67 @@
 @section('content')
 <div class="container">
     @if(count($userreserv)>0)
-    <h2 class="mt-5 mb-3">Manage Reservation</h2> 
-    @include('success') 
+    <!-- @include('success') -->
+    <div class="alert alert-info" role="alert">
+      <h4 class="alert-heading"><strong>NOTE!</strong></h4>
+      <p>Visit the <strong>Boarding House</strong> to pay your <strong>Reservation</strong>. If you cant pay <strong>after 1 week of your reservation date</strong> your reservation will be <strong>Canceled</strong></p>
+    </div>
     @include('errors')
+    <h2 class="mt-1 mb-2">Manage Reservation</h2> 
     <div class="row">
         <div class="col">
-            <table class="table">
+            <table class="table" id="clientTable">
                 <thead class="text-white bg-dark">
                     <tr>
                         <th>Reservation Code</th>
                         <th>Status</th>
                         <th>Room</th>
                         <th>Room Type</th>
-                        <th>Start Date</th>
-                        @if($userreserv->status != 'Cancel')
-                            <th>Actions</th>
-                        @else
-                            <th>Message</th>
-                        @endif
-
+                        <th>Check in</th>
+                        <th>Check out</th>
+                        <th>Date Reserved</th>
+                        @foreach($userreserv as $userreservs)
+                          @if($userreservs->status != 'Cancel')
+                              <th>Actions</th>
+                          @else
+                              <th>Message</th>
+                          @endif
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody>
+                  @foreach($userreserv as $userreservs)
                     <tr>
-                        <th>{{$userreserv->id}}</th>
-                        <td>{{$userreserv->status}}</td>
-                        <td>{{$userreserv->room->room_no}}</td>
-                        <td>{{$userreserv->room->type}}</td>
-                        <td>{{\Carbon\Carbon::parse($userreserv->start_date)->format('l jS \\of F Y')}}</td>
+                        <td>{{$userreservs->id}}</td>
+                        <td>{{$userreservs->status}}</td>
+                        <td>{{$userreservs->room->room_no}}</td>
+                        <td>{{$userreservs->room->type}}</td>
+                        <td>{{\Carbon\Carbon::parse($userreservs->check_in)->toFormattedDateString()}}</td>
+                        <td>{{\Carbon\Carbon::parse($userreservs->check_out)->toFormattedDateString()}}</td>
+                        <td>{{\Carbon\Carbon::parse($userreservs->created_at)->toFormattedDateString()}}</td>
                         <td>
-                            @if($userreserv->status != 'Cancel')
-                                <a href="/client/{{$userreserv->id}}/reservationEdit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i></a>
+                            @if($userreservs->status != 'Cancel')
+                                <a href="/client/{{$userreservs->id}}/reservationEdit" class="btn btn-success"><i class="fa fa-pencil-square-o"></i></a>
 
-                                <a href="/reservations/{{$userreserv->id}}/cancel" class="btn btn-danger cancel-data-btn"><i class="fa fa-times-circle"></i></a> 
+                                <button class="btn btn-warning cancel-data-btn" data-id="{{$userreservs->id}}">
+                                <i class="fa fa-remove"></i></a>
+                                </button>
                             @else
-                            Your Reservation is Canceled 
+                            Your Reservation has been Canceled 
                             @endif
                         </td>
                     </tr>
+                  @endforeach
                 </tbody>
             </table>
         </div>
     </div>
     @else
-    <div class="container mt-5">
-        <h2 class="text-center">Nothing to manage.. to use this account please 
-        reserve a room</h2>
-        <a href="/online/reservation" class="btn btn-primary">Reserve Room</a>
+    <div class="container">
+      <div class="alert alert-warning text-center" role="alert">
+        <strong>No reservation!</strong> To use this account please  
+        <a href="/online/reservation" class="alert-link"><h1>Reserve A Room.</h1></a>
+      </div>
     </div>
     @endif
 </div>
@@ -61,9 +75,9 @@
 $(document).off('click','.cancel-data-btn').on('click','.cancel-data-btn', function(e){
           e.preventDefault();
           var that = this; 
-          alert("ID:  " + $(this).attr('Id'));
+          // alert("ID:  " + $(this).attr('Id'));
                 bootbox.confirm({
-                  title: "Confirm Cancel data Data?",
+                  title: "Confirm Cancel?",
                   className: "del-bootbox text-",
                   message: "Are you sure you want to cancel Reservation?",
                   buttons: {
@@ -80,16 +94,15 @@ $(document).off('click','.cancel-data-btn').on('click','.cancel-data-btn', funct
                      if(result){
                       var token = '{{csrf_token()}}'; 
                       $.ajax({
-                      url:'/reservations/'+that+'/cancel',
+                      url:'/client/'+that.dataset.id+'/cancelReserv',
                       type: 'post',
                       data: { status : 'Cancel', _token : token},
                       success:function(result){
-                        $("#cancelReservationDatatable").DataTable().ajax.url( '/reservations/cancelReservationDatatable' ).load();
-                        if(result.success){
-                        swal({
-                            title: result.msg,
-                            icon: "success"
-                          });
+                        if(result.success)
+                        {
+                        swal({title: result.msg, icon: "success"}).then(function(){ 
+                          location.reload(); 
+                        });
                         }else{
                         swal({
                             title: result.msg,

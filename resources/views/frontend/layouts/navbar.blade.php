@@ -5,8 +5,15 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navNavbar">
-
       <ul class="navbar-nav ml-auto" >
+
+      <li class="nav-item active">
+      <a href="/" class="nav-link">Home</a>
+      </li>
+
+      <li class="nav-item active">
+      <a href="/rooms" class="nav-link">Rooms</a>
+      </li>
 
       <li class="nav-item active">
       <a href="/online/reservation" class="nav-link">Reserve A Room</a>
@@ -15,16 +22,13 @@
       <li class="nav-item active">
       <a href="/galleries" class="nav-link">View Gallery</a>
       </li>
-<!-- 
-      <li class="nav-item active">
-      <a href="" class="nav-link">Services</a>
-      </li> -->
 
       <li class="nav-item active">
-      <a href="/contactus" class="nav-link">Contact Us</a>
+      <a href="/contactus" class="nav-link">About Us</a>
       </li>
 
       @guest
+      
       <li class="nav-item active">
       <a href="{{ url('/login')}}" class="nav-link">Login</a>
       </li>
@@ -54,6 +58,7 @@
       </div> 
       </div>
       @endguest
+    
     </div>
   </div>
 </nav>

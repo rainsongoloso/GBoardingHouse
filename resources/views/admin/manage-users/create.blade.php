@@ -45,7 +45,7 @@
 
         <div class="form-group col-md-3">
             <label for="dob">Date of Birth</label>
-            <input id="dob" type="date" name="dob" class="form-control" required>
+            <input id="dob" type="date" name="dob" class="form-control" required min="1970-01-01" max="2004-12-30">
             <span class="help-text text-danger"></span>
         </div>
 

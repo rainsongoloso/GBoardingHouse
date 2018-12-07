@@ -11,11 +11,10 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-9 m-auto">
+
         <div class="table-responsive">
             <table class="table table-bordered table-striped" id='roomsDatatable'>
-                <thead class="thead-dark">
+                <thead class="thead-light">
                     <tr>
                         <th>Room Id</th>
                         <th>Room No.</th>
@@ -24,13 +23,14 @@
                         <th>Description</th>
                         <th>Capacity</th>
                         <th>Rate</th>
+                        <th>Created at</th>
+                        <th>Last updated</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
             </table>
         </div>
-    </div>
-</div>
+   
 <hr>
 </div>  
 
@@ -101,6 +101,9 @@
                 "url":'/manage-rooms/getRoomsDatatable',
                 "type": "GET"
             },
+             "columnDefs": [
+            { className: "dt-right", "targets": [ 6 ] }    
+            ],  
             columns: [
                 {data: 'id',      	    name: 'id'},
                 {data: 'room_no',     	name: 'room_no'},
@@ -108,7 +111,9 @@
                 {data: 'type',       	  name: 'type'},
                 {data: 'description',   name: 'description'},
                 {data: 'capacity', 		  name: 'capacity'},
-                {data: 'rate', render: $.fn.dataTable.render.number( ',', '.', 2, 'P' ),      	  name: 'rate'},
+                {data: 'rates', render: $.fn.dataTable.render.number( ',', '.', 2, 'P' ),      	  name: 'rates'},
+                {data: 'created',      name: 'created'},
+                {data: 'updated',      name: 'updated'},
                 {data: 'action' ,       name: 'action', orderable: false, searchable: false}
             ],
             

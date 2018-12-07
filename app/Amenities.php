@@ -14,7 +14,7 @@ class Amenities extends Model
 
     public function occupants()
     {
-    	return $this->hasMany('App\Occupant');
+    	return $this->belongsToMany('App\Occupant','occupant_amenities','amenities_id','occupant_id');
     } 
 
     public function reservation()

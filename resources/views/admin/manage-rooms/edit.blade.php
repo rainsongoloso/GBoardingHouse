@@ -31,6 +31,8 @@
             <select class="custom-select" id="status" name="status">
                 <option value="Available" {{$room->status == 'Available' ? 'selected':''}}>Available</option>
                 <option value="Unavailable" {{$room->status == 'Unavailable' ? 'selected':''}}>Unavailable</option>
+                <option value="Occupied" {{$room->status == 'Occupied' ? 'selected':''}}>Occupied</option>
+                <option value="Full" {{$room->status == 'Full' ? 'selected':''}}>Full</option>
             </select>
         </div>
 

@@ -18,7 +18,7 @@
     <div class="col-md-12 mt-3">
         <div class="table-responsive">
             <table class="table table-bordered table-striped  mt-3" id="amenityDatatable">
-                <thead class="thead-dark">
+                <thead class="thead-light">
                     <th>Id</th>
                     <th>Name</th>
                     <th>Description</th>

@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="container">
-<h1 class="text-center"> Payments </h1>
+<h1 class="text-center"> Process Payments </h1>
 <hr>
 @include('success')
     <div class="row mt-4">
-        <div class="col-md-3 ">
+        <div class="col-md-4 ">
         
             <form action="/process/tenant_payments" method="get" id="find-users-form">
 
@@ -14,7 +14,6 @@
 
             <h4>Rental Payments</h4>
                 <div class="form-group">
-                    <!-- <label for="occupant_id">Tenants:</label> -->
                     <select class="custom-select" id="occupant_id" name="occupant_id" required>
                         <option value="0">Please choose tenant..</option>
                         @if(count($occupants) > 0)
@@ -25,29 +24,6 @@
                     </select>
                     <span class="help-text text-danger"></span>
                 </div>
-
-               <!-- <div class="form-group">
-                    <label for="remarks">Remarks:</label>
-                    <select class="custom-select" id="remarks" name="remarks" required>
-                        <option selected>Choose remarks...</option>
-                        <option value="Advance payment">Advance payment</option>
-                        <option value="Deposit">Deposit</option>
-                        <option value="Rent">Rent</option>
-                    </select>
-                    <span class="help-text text-danger"></span>
-                </div>
-                
-                <div class="form-group">
-                    <label for="payFor">Payment For:</label>
-                    <input id="payFor" type="date" name="payFor" class="form-control" required="">
-                    <span class="help-text text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="amount">Amount</label>
-                    <input id="amount" type="numeric" name="amountPay" class="form-control" required>
-                    <span class="help-text text-danger"></span>
-                </div> -->
                 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="myFunction()">Cancel</button>
@@ -55,18 +31,14 @@
                 </div>
             </form>
         </div>
-
-       
         @yield('payments')
-        
-
 </div>
 
  <div class="row mt-5">        
         <div class="col-md-12">
             <div class="table-responsive">
                 <table class="table" id="paymentsDatatable">
-                    <thead class="thead-dark">
+                    <thead class="thead-light">
                         <tr>
                             <th>Id</th>
                             <th>Tenant</th>
@@ -100,6 +72,11 @@ $(function() {
             "url":'/process/getProcessDatatable',
             "type": "GET",
         },
+
+        "columnDefs": [
+        { className: "dt-right", "targets": [ 5,6,7 ] }    
+        ],
+
         columns: [
             {data: 'id',         name: 'id'},
             {data: 'occupant',   name: 'occupant'},
@@ -109,7 +86,7 @@ $(function() {
             {data: 'debit', render: $.fn.dataTable.render.number( ',', '.', 2, 'P' ),        name: 'debit'},
             {data: 'credit', render: $.fn.dataTable.render.number( ',', '.', 2, 'P' ),       name: 'credit'},
             {data: 'balance',render: $.fn.dataTable.render.number( ',', '.', 2, 'P' ),       name: 'balance'},
-            {data: 'created_at',       name: 'created_at'},
+            {data: 'datepaid',       name: 'datepaid'},
             // {data: 'action',        name: 'action'},
         ]
     });
@@ -129,6 +106,8 @@ $(function() {
                         swal({
                             title: result.msg,
                             icon: "success"
+                        }).then(function(){ 
+                          location.reload(); 
                         });
                     } else {
                         swal({

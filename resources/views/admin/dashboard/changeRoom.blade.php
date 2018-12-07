@@ -7,7 +7,7 @@
 		<label for="status">Room</label>
 		<select class="custom-select" id="status" name="room_id">
 			@foreach($rooms as $room)
-			<option value="{{$room->id}}" selected>{{$room->room_no}}</option>
+			<option value="{{$room->id}}" selected>{{$room->room_no}} - {{$room->type}}</option>
 			@endforeach
 		</select>
 
@@ -16,7 +16,7 @@
   
 	<div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-		<button class="btn btn-primary add-btn">Update</button><!-- add-btn -->
+		<button class="btn btn-success add-btn">Update</button><!-- add-btn -->
 	</div>
 </form>
 

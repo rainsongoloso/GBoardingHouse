@@ -6,7 +6,7 @@
 		<select class="custom-select" id="status" name="user_id">
       <option selected>Select user...</option>
 			@foreach($users as $user)
-			<option value="{{$user->id}}">{{$user->id}} - {{$user->full_name}}</option>
+			<option value="{{$user->id}}">{{$user->id}} - {{$user->username}}</option>
 			@endforeach
 		</select> 
 	
@@ -14,19 +14,9 @@
 		<select class="custom-select" id="status" name="room_id">
       <option selected>Select room...</option>
 			@foreach($rooms as $room)
-			<option value="{{$room->id}}">{{$room->room_no}} - {{$room->type}} - {{number_format($room->rate,2)}}</option>
+			<option value="{{$room->id}}">{{$room->room_no}} - {{$room->type}} - {{number_format($room->rate,2)}} Capacity:{{$room->max_capacity}}</option>
 			@endforeach
 		</select> 
-
-    <label for="status">Amenities</label>
-    <select class="custom-select" id="status" name="amenities_id">
-       <option selected>Select amenity...</option>
-      @foreach($amenities as $amenity)
-      <option value="{{$amenity->id}}">{{$amenity->amen_name}} - {{number_format($amenity->rate,2)}}</option>
-      @endforeach
-    </select> 
-    
-  </div>
 	<div class="modal-footer">
 		<button class="btn btn-primary add-btn">Submit</button>
 		<button class="btn btn-secondary" data-dismiss="modal">Cancel</button>

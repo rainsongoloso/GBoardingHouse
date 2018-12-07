@@ -26,7 +26,7 @@ class ClientController extends Controller
 				$getAuthId = auth()->user()->id;
 
                 $userreserv = User::find($getAuthId)->reservation;
-
+            
                 if(count($userreserv)>0)
                 {
                     return view('client.index',compact('userreserv'));
@@ -42,7 +42,16 @@ class ClientController extends Controller
 
                 $user = User::find($getAuthId);
 
-                return view('tenant.dashboard',compact('user'));  
+                $userOc = User::find($getAuthId)->occupant;
+
+                if(count($userOc)>0)
+                {
+                    $occId = $userOc->id;
+
+                    $occupantA = Occupant::find($occId)->amenities()->get();
+                }
+
+                return view('tenant.dashboard',compact('user','occupantA'));  
             }	  
 		}
     }
@@ -51,11 +60,32 @@ class ClientController extends Controller
     {
     	$reservation = Reservation::find($id);
 
-    	$rooms = Room::where('status','Available')->get();
+        $checkInDate = \Carbon\Carbon::parse($reservation->check_in);
+        $checkOutDate = \Carbon\Carbon::parse($reservation->check_out);
 
-        $getToday = \Carbon\Carbon::now();
+        $formatCheckIn = $checkInDate->toDateString();
+        $formatCheckOut =  $checkOutDate->toDateString();
 
-        $format = $getToday->toDateString();
+        $rooms = \DB::table('rooms')
+        ->where('status','<>','Full')
+        //->Where('status','=','Occupied')
+            ->whereNotIn('id', function($query) use ($formatCheckIn,$formatCheckOut)
+             {
+                $query->select('room_id')
+                    ->from(with(new Reservation)->getTable())
+                    ->where(function($query) use ($formatCheckIn,$formatCheckOut)
+                    {
+                        $query
+                        ->where('status','<>','Cancel')
+                        ->where('check_out','<',$formatCheckOut)
+                        ->orWhere('check_in','>',$formatCheckIn)
+                        ->where('check_out','<=',$formatCheckOut)
+                        ->orWhere('check_in','>=',$formatCheckIn)
+                            ;
+                    });
+             })
+            ->orderBy('type')
+            ->get();
 
     	return view('client.edit',compact('reservation','rooms','format'));
     }
@@ -69,7 +99,14 @@ class ClientController extends Controller
         'start_date' => 'required|date', 
         ]);
 
-    	$reservation->start_date = $request->start_date;
+        $getDate = \Carbon\Carbon::parse($request->start_date);
+        $getDate2 = \Carbon\Carbon::parse($request->check_out);
+
+        $check_in = $getDate->toDateString();
+        $check_out = $getDate2->toDateString();
+
+    	$reservation->check_in = $check_in;
+        $reservation->check_out = $check_out;
     	$reservation->room_id  = $request->room_id;
     	$reservation->save();
 
@@ -77,5 +114,21 @@ class ClientController extends Controller
 
         return redirect('/client');
 
+    }
+
+    public function cancelReserv($id)
+    {
+        $reservation = Reservation::find($id);
+        
+        $reservation->status = 'Cancel';
+
+        if($reservation->save())
+        {
+          return response()->json(['success' => true, 'msg' => 'Reservation successfully canceled!']);
+        }
+        else
+        {
+          return response()->json(['success' => false, 'msg' => 'An error occured while canceling reservation!']);
+        }  
     }
 }

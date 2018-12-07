@@ -29,11 +29,11 @@ class ManageAmenitiesController extends Controller
     public function getAmenitiesDatatable()
     {
         return Datatables::eloquent(Amenities::query())->addColumn('action', function($amen){
-        return '<button class="btn btn-success edit-data-btn" data-id="'.$amen->id.'">
+        return '<button class="btn btn-success btn-sm edit-data-btn" data-id="'.$amen->id.'">
                 <i class="fa fa-edit"></i></a>
                 </button>
 
-                <button class="btn btn-danger delete-data-btn" data-id="'.$amen->id.'">
+                <button class="btn btn-danger btn-sm delete-data-btn" data-id="'.$amen->id.'">
                     <i class="fa fa-trash"></i>
                   </button>
                 ';
@@ -135,13 +135,28 @@ class ManageAmenitiesController extends Controller
      */
     public function destroy($id)
     {
+
+    try {
+
       if(Amenities::destroy($id))
       {
-      return response()->json(['success' => true, 'msg' => 'Data Successfully deleted!']);
+      return response()->json(['success' => true, 'msg' => 'Amenity Successfully deleted!']);
       }
       else
       {
-      return response()->json(['success' => false, 'msg' => 'An error occured while deleting data!']);
-      } 
+      return response()->json(['success' => false, 'msg' => 'An error occured while deleting amenity!']);
+      }
+            
+    }
+    catch (\Illuminate\Database\QueryException $e) 
+    {
+        if($e)
+        {
+            return response()->json(['success' => false, 'msg' => 'Amenity cannot be deleted']);      
+        }
+            
+    }
+
+       
     }
 }

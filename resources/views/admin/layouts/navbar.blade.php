@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-5">
 		<a href="{{ url('admin')}}" class="navbar-brand">Admin</a>
 		<button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
 			<span class="navbar-toggler-icon"></span>
@@ -33,18 +33,18 @@
 				</li> -->
 
 				<li class="nav-item">
-					<a href="/process/billing" class="nav-link">Payments</a>
+					<a href="/process/billing" class="nav-link">Process Payments</a>
 				</li>
 
 				<li class="nav-item">
-					<a href="/billing/index" class="nav-link">Billings</a>
+					<a href="/billing/index" class="nav-link">View Bills</a>
 				</li>
 			
 				<li class="nav-item">
 					<div class="dropdown">
 						<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>Generate Reports</a>
 						<div class="dropdown-menu">
-							<a href="/reports/monthly" class="dropdown-item">Monthly</a>
+							<a href="/reports/monthly" class="dropdown-item">Collection of payments</a>
 							<a href="/reports/occupancy" class="dropdown-item">Occupants</a>
 						</div>	
 					</div>
@@ -65,10 +65,10 @@
 
 				<div class="dropdown-menu">
 
-					<a href="/" class="dropdown-item">
+					<!-- <a href="/" class="dropdown-item">
 						<i class="fa fa-home"></i>
 						Home 
-					</a>
+					</a> -->
 
 					<a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                         <i class="fa fa-sign-out"></i> Logout
